@@ -17,12 +17,20 @@ import android.widget.TextView;
 import android.widget.Toast;
 
 import java.util.WeakHashMap;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
 public class MainActivity extends AppCompatActivity {
 
     TextView textView;
     Button btnpdf;
     WebView mWebView;
+
+    private static final String REGEX = "https";
+
+    int start1;
+    int end1;
+    String mediumurl;
 
     //todo 3. Add regular expression to get the url from medium post.
 
@@ -53,19 +61,46 @@ public class MainActivity extends AppCompatActivity {
 
         final String text1 = intent.getStringExtra(Intent.EXTRA_TEXT);
 
-        if (Intent.ACTION_SEND.equals(action) && type!=null)
-        {
+
+        //I will send url after getting original url "medium"
+
+      //  Pattern p = Pattern.compile(REGEX);
+       // Matcher m = p.matcher(text1);   // get a matcher object
+       // int count = 0;
+
+/*
+        //System.out.println("Length is " + text1.length());
+
+        end1 = text1.length();
+
+        while (m.find()) {
+
+            System.out.println("inside while");
+            count++;
+            System.out.println("Match number " + count);
+            System.out.println("start(): " + m.start());
+
+            start1 = m.start();
+
+            System.out.println("end(): " + m.end());
+        }
+
+        mediumurl = text1.substring(start1, end1);
+
+        */
+
+        if (Intent.ACTION_SEND.equals(action) && type != null) {
             if ("text/plain".equals(type)) {
                 handleSendText(intent); // Handle text being sent
             } else {
-                Toast.makeText(getApplication(),"Something unknown passed",Toast.LENGTH_LONG).show(); // Handle single image being sent
+                Toast.makeText(getApplication(), "Something unknown passed", Toast.LENGTH_LONG).show(); // Handle single image being sent
             }
         }
 
         btnpdf.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                printPDF(text1);
+                printPDF(mediumurl);
             }
         });
     }
@@ -75,8 +110,8 @@ public class MainActivity extends AppCompatActivity {
         doWebViewPrint(text2);
 
 
-
     }
+
     private void doWebViewPrint(String uop) {
         // Create a WebView object specifically for printing
         WebView webView = new WebView(MainActivity.this);
@@ -88,13 +123,12 @@ public class MainActivity extends AppCompatActivity {
 
             @Override
             public void onPageFinished(WebView view, String url) {
-               // Log.i(TAG, "page finished loading " + url);
-                Toast.makeText(getApplicationContext(),url,Toast.LENGTH_LONG).show();
+                // Log.i(TAG, "page finished loading " + url);
+                Toast.makeText(getApplicationContext(), url, Toast.LENGTH_LONG).show();
                 createWebPrintJob(view);
                 mWebView = null;
             }
         });
-
 
 
         // Print an existing web page (remember to request INTERNET permission!):
@@ -122,20 +156,42 @@ public class MainActivity extends AppCompatActivity {
                 new PrintAttributes.Builder().build());
 
         // Save the job object for later status checking
-       // mPrintJobs.add(printJob);
+        // mPrintJobs.add(printJob);
     }
 
     private void handleSendText(Intent intent) {
 
         String text = intent.getStringExtra(Intent.EXTRA_TEXT);
 
-        if (text!=null)
-        {
-            textView.setText(text);
-        }
-        else
-            {
-                textView.setText("Shit this is not working");
+        if (text != null) {
+            //textView.setText(text);
+
+            Pattern p = Pattern.compile(REGEX);
+            Matcher m = p.matcher(text);   // get a matcher object
+            int count = 0;
+
+
+            //System.out.println("Length is " + text1.length());
+
+            end1 = text.length();
+
+            while (m.find()) {
+
+                System.out.println("inside while");
+                count++;
+                System.out.println("Match number " + count);
+                System.out.println("start(): " + m.start());
+
+                start1 = m.start();
+
+                System.out.println("end(): " + m.end());
             }
+
+            mediumurl = text.substring(start1, end1);
+            Toast.makeText(getApplication(), "Updating tv from other class", Toast.LENGTH_LONG).show();
+        } else {
+            textView.setText("Shit this is not working");
+        }
     }
+
 }
